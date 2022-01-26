@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Store from 'electron-store';
@@ -41,6 +41,21 @@ ipcMain.on('ipc-example', async (event, arg) => {
   const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
   console.log(msgTemplate(arg));
   event.reply('ipc-example', msgTemplate('pong'));
+});
+
+ipcMain.handle('openFolder', async (handler, args) => {
+  return new Promise((resolve, reject) => {
+    const result = dialog.showOpenDialog({
+      properties: ['openDirectory'],
+    });
+    // eslint-disable-next-line promise/catch-or-return
+    result.then((res) => {
+      resolve(res);
+    });
+    result.catch((err) => {
+      reject(err);
+    });
+  });
 });
 
 if (process.env.NODE_ENV === 'production') {

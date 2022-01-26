@@ -10,11 +10,26 @@ declare global {
         set: (key: string, val: any) => void;
         // any other methods you've defined...
       };
+      openDialog: {
+        open: () => Promise<FolderPath>;
+      };
     };
   }
 }
 
+interface FolderPath {
+  canceled: boolean;
+  filePaths: [string];
+}
+
 const Hello = () => {
+  const handleGetDownloadPath = async () => {
+    const result = await window.electron.openDialog.open();
+    window.electron.store.set('savePath', result.filePaths[0]);
+    // eslint-disable-next-line no-console
+    console.log(window.electron.store.get('savePath'));
+  };
+
   return (
     <div>
       <div className="Hello">
@@ -22,30 +37,9 @@ const Hello = () => {
       </div>
       <h1>electron-react-boilerplate</h1>
       <div className="Hello">
-        <a
-          href="https://electron-react-boilerplate.js.org/"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              📚
-            </span>
-            Read our docs
-          </button>
-        </a>
-        <a
-          href="https://github.com/sponsors/electron-react-boilerplate"
-          target="_blank"
-          rel="noreferrer"
-        >
-          <button type="button">
-            <span role="img" aria-label="books">
-              🙏
-            </span>
-            Donate
-          </button>
-        </a>
+        <button type="button" onClick={handleGetDownloadPath}>
+          Get dir
+        </button>
       </div>
     </div>
   );

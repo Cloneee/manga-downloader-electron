@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer } = require('electron');
+const { contextBridge, ipcRenderer, dialog } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
@@ -20,9 +20,6 @@ contextBridge.exposeInMainWorld('electron', {
       }
     },
   },
-});
-
-contextBridge.exposeInMainWorld('electron', {
   store: {
     get(val) {
       return ipcRenderer.sendSync('electron-store-get', val);
@@ -32,6 +29,12 @@ contextBridge.exposeInMainWorld('electron', {
     },
     // Other method you want to add like has(), reset(), etc.
   },
-  // Any other methods you want to expose in the window object.
-  // ...
+  openDialog: {
+    open() {
+      return ipcRenderer.invoke('openFolder', true);
+    },
+    test() {
+      return 'ok';
+    },
+  },
 });
