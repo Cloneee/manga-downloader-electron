@@ -31,7 +31,12 @@ contextBridge.exposeInMainWorld('electron', {
   },
   openDialog: {
     open() {
-      return ipcRenderer.invoke('openFolder', true);
+      return ipcRenderer.invoke('openFolder');
+    },
+  },
+  crawler: {
+    search(mangaName) {
+      return ipcRenderer.invoke('search', mangaName);
     },
   },
 });

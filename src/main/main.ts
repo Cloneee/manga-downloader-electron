@@ -23,13 +23,14 @@ import {
   isMaximized,
   saveMaximized,
 } from './setting';
+import { search } from './crawl';
 
 const store = new Store();
 
 ipcMain.on('electron-store-get', async (event, val) => {
   event.returnValue = store.get(val);
 });
-ipcMain.on('electron-store-set', async (event, key, val) => {
+ipcMain.on('electron-store-set', async (_event, key, val) => {
   store.set(key, val);
 });
 
@@ -49,7 +50,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
-ipcMain.handle('openFolder', async (handler, args) => {
+ipcMain.handle('openFolder', async (_handler) => {
   return new Promise((resolve, reject) => {
     const result = dialog.showOpenDialog({
       properties: ['openDirectory'],
@@ -65,6 +66,10 @@ ipcMain.handle('openFolder', async (handler, args) => {
       reject(err);
     });
   });
+});
+
+ipcMain.handle('search', async (_handler, mangaName) => {
+  return search(mangaName);
 });
 
 if (process.env.NODE_ENV === 'production') {

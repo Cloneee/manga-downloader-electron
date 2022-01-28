@@ -1,4 +1,7 @@
+/* eslint-disable no-console */
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import { useState } from 'react';
+import { IMangaSearchList, IFolderPath } from '../interfaces';
 import icon from '../../assets/icon.svg';
 import './App.css';
 
@@ -11,23 +14,29 @@ declare global {
         // any other methods you've defined...
       };
       openDialog: {
-        open: () => Promise<FolderPath>;
+        open: () => Promise<IFolderPath>;
+      };
+      crawler: {
+        search: (mangaName: string) => Promise<IMangaSearchList[]>;
       };
     };
   }
 }
 
-interface FolderPath {
-  canceled: boolean;
-  filePaths: [string];
-}
-
 const Hello = () => {
+  const [search, setSearch] = useState('');
   const handleGetDownloadPath = async () => {
     const result = await window.electron.openDialog.open();
     window.electron.store.set('savePath', result.filePaths[0]);
     // eslint-disable-next-line no-console
     console.log(window.electron.store.get('savePath'));
+  };
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearch(e.target.value);
+  };
+  const handleSearch = async () => {
+    const result = await window.electron.crawler.search(search);
+    console.log(result);
   };
 
   return (
@@ -35,8 +44,12 @@ const Hello = () => {
       <div className="Hello">
         <img width="200px" alt="icon" src={icon} />
       </div>
-      <h1>electron-react-boilerplate</h1>
+      <h1>Fayaku Manga Downloader</h1>
       <div className="Hello">
+        <input type="text" id="search-bar" onChange={handleSearchChange} />
+        <button type="button" onClick={handleSearch}>
+          Search
+        </button>
         <button type="button" onClick={handleGetDownloadPath}>
           Get dir
         </button>
