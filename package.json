@@ -1,6 +1,6 @@
 {
-  "name": "electron-react-boilerplate",
-  "description": "A foundation for scalable desktop apps",
+  "name": "fayaku-manga-downloader",
+  "description": "Download manga for reading offline",
   "scripts": {
     "build": "concurrently \"npm run build:main\" \"npm run build:renderer\"",
     "build:main": "cross-env NODE_ENV=production TS_NODE_TRANSPILE_ONLY=true webpack --config ./.erb/configs/webpack.config.main.prod.ts",
@@ -29,8 +29,8 @@
     ]
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "FayakuMangaDL",
+    "appId": "org.erb.FayakuMangaDL",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -88,34 +88,28 @@
     ],
     "publish": {
       "provider": "github",
-      "owner": "electron-react-boilerplate",
-      "repo": "electron-react-boilerplate"
+      "owner": "Cloneee",
+      "repo": "manga-downloader-electron"
     }
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
+    "url": "git+https://github.com/Cloneee/manga-downloader-electron.git"
   },
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "Cloneee",
+    "email": "thanhhuyn.0@gmail.com",
+    "url": "https://fb.com/NTH.Clone"
   },
   "contributors": [
     {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
-    },
-    {
-      "name": "John Tran",
-      "email": "jptran318@gmail.com",
-      "url": "https://github.com/jooohhn"
+      "name": "Luu Tuan Kha",
+      "url": "https://fb.com/luu.t.kha"
     }
   ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
+    "url": "https://github.com/Cloneee/manga-downloader-electron/issues"
   },
   "keywords": [
     "electron",
@@ -128,7 +122,7 @@
     "hot",
     "reload"
   ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
+  "homepage": "https://github.com/Cloneee/manga-downloader-electron#readme",
   "jest": {
     "testURL": "http://localhost/",
     "testEnvironment": "jsdom",
