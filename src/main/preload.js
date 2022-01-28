@@ -1,4 +1,4 @@
-const { contextBridge, ipcRenderer, dialog } = require('electron');
+const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electron', {
   ipcRenderer: {
@@ -32,9 +32,6 @@ contextBridge.exposeInMainWorld('electron', {
   openDialog: {
     open() {
       return ipcRenderer.invoke('openFolder', true);
-    },
-    test() {
-      return 'ok';
     },
   },
 });

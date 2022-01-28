@@ -17,6 +17,12 @@ import log from 'electron-log';
 import Store from 'electron-store';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
+import {
+  getWinSetting,
+  saveBounds,
+  isMaximized,
+  saveMaximized,
+} from './setting';
 
 const store = new Store();
 
@@ -50,6 +56,9 @@ ipcMain.handle('openFolder', async (handler, args) => {
     });
     // eslint-disable-next-line promise/catch-or-return
     result.then((res) => {
+      if (!res.canceled) {
+        store.set('downloadFolder', res.filePaths);
+      }
       resolve(res);
     });
     result.catch((err) => {
@@ -96,10 +105,12 @@ const createWindow = async () => {
     return path.join(RESOURCES_PATH, ...paths);
   };
 
+  const bounds = getWinSetting();
+
   mainWindow = new BrowserWindow({
     show: false,
-    width: 1024,
-    height: 728,
+    width: bounds[0],
+    height: bounds[1],
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -108,6 +119,12 @@ const createWindow = async () => {
   });
 
   mainWindow.loadURL(resolveHtmlPath('index.html'));
+  if (isMaximized()) {
+    mainWindow.maximize();
+  }
+
+  mainWindow.on('maximize', () => saveMaximized(true));
+  mainWindow.on('unmaximize', () => saveMaximized(false));
 
   mainWindow.on('ready-to-show', () => {
     if (!mainWindow) {
@@ -119,6 +136,8 @@ const createWindow = async () => {
       mainWindow.show();
     }
   });
+
+  mainWindow.on('resized', () => saveBounds(mainWindow?.getSize()));
 
   mainWindow.on('closed', () => {
     mainWindow = null;
