@@ -1,10 +1,8 @@
-/* eslint-disable prettier/prettier */
-/* eslint global-require: off, no-console: off, promise/always-return: off */
-import path from 'path';
+/* eslint-disable prefer-destructuring */
+/* eslint-disable @typescript-eslint/no-unused-expressions */
 import axios from 'axios';
 import cheerio from 'cheerio';
-import fs from 'fs';
-import { IMangaSearchList } from '../interfaces';
+import { IMangaSearchList, IMangaInfo } from '../interfaces';
 
 const search = async (mangaName: string) => {
   let mangaList: IMangaSearchList[];
@@ -37,8 +35,44 @@ const search = async (mangaName: string) => {
   return mangaList;
 };
 
-const crawl = (link: string) => {
-  return link;
+const getInfo = async (mangaLink: string) => {
+  const resp = await axios.get(mangaLink);
+  const $ = cheerio.load(resp.data);
+  const mangaInfo = <IMangaInfo>{};
+  mangaInfo.name = $('.series-name a').text();
+  const tagRaw = $('.badge-info');
+  mangaInfo.tag = Array.from(tagRaw.map((_index, el) => $(el).text()));
+  const tempArray = $('div.series-information > .info-item').toArray();
+  tempArray.forEach((el) => {
+    switch ($(el).find('.info-name').text()) {
+      case 'Tình trạng:':
+        mangaInfo.status = $(el).find('.info-value').text();
+        break;
+      case 'Tác giả:':
+        mangaInfo.author = $(el).find('.info-value').text();
+        break;
+      case 'Tên khác:':
+        mangaInfo.otherName = $(el).find('.info-value').text();
+        break;
+      default:
+        break;
+    }
+  });
+  const style = $('.series-cover > div > div').attr('style') || '';
+  const imgurl = style.match(/url\(["']?([^"']*)["']?\)/);
+  // eslint-disable-next-line prettier/prettier
+  imgurl ? (mangaInfo.thumbnail = imgurl[1]) : null;
+  mangaInfo.summary = $('div.summary-content > p').text() || '';
+  const chapters = $('.list-chapters.at-series > a')
+    .toArray()
+    .map((link) => {
+      return {
+        chapter: $(link).attr('title') || '',
+        url: $(link).attr('href') || '',
+      };
+    });
+  mangaInfo.chapters = chapters;
+  return mangaInfo;
 };
 
-export { search, crawl };
+export { search, getInfo };

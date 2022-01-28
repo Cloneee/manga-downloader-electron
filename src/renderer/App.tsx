@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
-import { IMangaSearchList, IFolderPath } from '../interfaces';
+import { IMangaSearchList, IFolderPath, IMangaInfo } from '../interfaces';
 import icon from '../../assets/icon.svg';
 import './App.css';
 
@@ -18,6 +18,7 @@ declare global {
       };
       crawler: {
         search: (mangaName: string) => Promise<IMangaSearchList[]>;
+        getInfo: (mangaLink: string) => Promise<IMangaInfo>;
       };
     };
   }
@@ -25,6 +26,7 @@ declare global {
 
 const Hello = () => {
   const [search, setSearch] = useState('');
+  const [mangaLink, setMangaLink] = useState('');
   const handleGetDownloadPath = async () => {
     const result = await window.electron.openDialog.open();
     window.electron.store.set('savePath', result.filePaths[0]);
@@ -36,6 +38,13 @@ const Hello = () => {
   };
   const handleSearch = async () => {
     const result = await window.electron.crawler.search(search);
+    console.log(result);
+  };
+  const handleLinkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setMangaLink(e.target.value);
+  };
+  const handleDownload = async () => {
+    const result = await window.electron.crawler.getInfo(mangaLink);
     console.log(result);
   };
 
@@ -52,6 +61,12 @@ const Hello = () => {
         </button>
         <button type="button" onClick={handleGetDownloadPath}>
           Get dir
+        </button>
+      </div>
+      <div className="Hello">
+        <input type="text" id="download-bar" onChange={handleLinkChange} />
+        <button type="button" onClick={handleDownload}>
+          Get Info
         </button>
       </div>
     </div>

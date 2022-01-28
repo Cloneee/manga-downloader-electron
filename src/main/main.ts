@@ -23,7 +23,7 @@ import {
   isMaximized,
   saveMaximized,
 } from './setting';
-import { search } from './crawl';
+import { search, getInfo } from './crawl';
 
 const store = new Store();
 
@@ -70,6 +70,10 @@ ipcMain.handle('openFolder', async (_handler) => {
 
 ipcMain.handle('search', async (_handler, mangaName) => {
   return search(mangaName);
+});
+
+ipcMain.handle('getInfo', (_handler, mangaLink: string) => {
+  return getInfo(mangaLink);
 });
 
 if (process.env.NODE_ENV === 'production') {

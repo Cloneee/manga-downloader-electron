@@ -3,14 +3,23 @@ interface IMangaSearchList {
   link: string;
   bgurl: string;
 }
-
-interface MangaDownload {
-  sonething: string;
+interface IMangaInfo {
+  mangaInfo: any;
+  name: string;
+  tag: string[];
+  author: string;
+  otherName: string;
+  status: string;
+  thumbnail: string;
+  summary: string;
+  chapters: {
+    chapter: string;
+    url: string;
+  }[];
 }
-
 interface IFolderPath {
   canceled: boolean;
   filePaths: [string];
 }
 
-export { IMangaSearchList, MangaDownload, IFolderPath };
+export { IMangaSearchList, IMangaInfo, IFolderPath };
