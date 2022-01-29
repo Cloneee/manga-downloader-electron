@@ -38,5 +38,8 @@ contextBridge.exposeInMainWorld('electron', {
     search(mangaName) {
       return ipcRenderer.invoke('search', mangaName);
     },
+    getInfo(mangaLink) {
+      return ipcRenderer.invoke('getInfo', mangaLink);
+    },
   },
 });

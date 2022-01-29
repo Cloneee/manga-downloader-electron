@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { useState } from 'react';
-import { IMangaSearchList, IFolderPath } from '../interfaces';
+import { IMangaSearchList, IFolderPath, IMangaInfo } from '../interfaces';
 import icon from '../../assets/icon.svg';
 import { ResultCard } from './components/common/ResultCard';
 
@@ -18,6 +18,7 @@ declare global {
       };
       crawler: {
         search: (mangaName: string) => Promise<IMangaSearchList[]>;
+        getInfo: (mangaLink: string) => Promise<IMangaInfo>;
       };
     };
   }
@@ -41,7 +42,6 @@ const Hello = () => {
     console.log(result);
     setresults(result)
   };
-  
   return (
     <div className="row text-center gap-3">
       <div className="Hello">
@@ -82,7 +82,6 @@ const Hello = () => {
         })
       }
       </div>
-     
     </div>
   );
 };
