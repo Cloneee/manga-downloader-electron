@@ -1,7 +1,12 @@
+/* eslint-disable react/no-array-index-key */
+/* eslint-disable react/self-closing-comp */
+/* eslint-disable no-useless-return */
+/* eslint-disable @typescript-eslint/no-use-before-define */
+/* eslint-disable prettier/prettier */
 /* eslint-disable no-console */
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import { useRef, useState } from 'react';
-import { IMangaSearchList, IFolderPath, IMangaInfo } from '../interfaces';
+import { useRef, useState , useEffect } from 'react';
+import { IMangaSearchList, IFolderPath, IMangaInfo, IMangaDownload } from '../interfaces';
 import icon from '../../assets/icon.svg';
 import { ResultCard } from './components/common/ResultCard';
 import { Info } from './components/screens/Info';
@@ -20,6 +25,8 @@ declare global {
       crawler: {
         search: (mangaName: string) => Promise<IMangaSearchList[]>;
         getInfo: (mangaLink: string) => Promise<IMangaInfo>;
+        getImages: (mangaChapter: IMangaDownload) => Promise<string[]>;
+        download: (mangaChaper: IMangaDownload) => Promise<void>;
       };
     };
   }
@@ -30,13 +37,18 @@ const Hello = () => {
   const [results, setresults] = useState<IMangaSearchList[]>([]);
   const [path, setpath] = useState('');
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  useEffect(()=>{
+    if (window.electron.store.get('savePath')) {
+      setpath(window.electron.store.get('savePath'));
+    }
+  }, [])
 
   const handleGetDownloadPath = async () => {
     const result = await window.electron.openDialog.open();
-    window.electron.store.set('savePath', result.filePaths[0]);
-    // eslint-disable-next-line no-console
-    // console.log(window.electron.store.get('savePath'));s
-    setpath(window.electron.store.get('savePath'));
+    if (!result.canceled) {
+      window.electron.store.set('savePath', result.filePaths[0]);
+      setpath(window.electron.store.get('savePath'));
+    }
   };
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
@@ -63,7 +75,6 @@ const Hello = () => {
         <img width="20px" alt="icon" src={icon} />
       </div>
       <h1>Fayaku Manga <span className="badge bg-danger">Downloader</span> </h1>
-      <p></p>
       <div className="col-12 d-flex justify-content-center ">
         <input
           style={{
@@ -93,7 +104,7 @@ const Hello = () => {
         </button>
       </div>
       <div className="col-12 d-flex justify-content-center ">
-        <strong>{results.length} &#160;</strong> Kết quả | Đường dẫn:  &#160;<strong >{path !== '' ? "..."+ path.substring(path.length-15,path.length): 'Chưa chọn'}</strong>
+        <strong>{results.length} &#160;</strong> Kết quả | Đường dẫn:  &#160;<strong >{path !== '' ? `...${ path.substring(path.length-15,path.length)}`: 'Chưa chọn'}</strong>
       </div>
       <div className=" row  d-flex justify-content-center">
         {results.map((item: IMangaSearchList, index) => {

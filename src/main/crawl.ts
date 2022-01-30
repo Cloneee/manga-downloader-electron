@@ -89,7 +89,7 @@ const getImageLinks = async (chapterLink: string) => {
   const result = $('#chapter-content > img')
     .toArray()
     .map((el) => $(el).attr('data-src'));
-  return result;
+  return result as string[];
 };
 
 const download = (
