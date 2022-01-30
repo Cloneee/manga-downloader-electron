@@ -20,7 +20,7 @@ export const Info = (props: Props) => {
   const [info, setinfo] = useState<IMangaInfo>();
   const [isCheckedAll, setisCheckedAll] = useState<boolean>(false);
   const [checkedList, setcheckedList] = useState<boolean[]>(
-    Array(info?.chapters.length).fill(true)
+    Array(info?.chapters.length).fill(false)
   );
   const handleCheckBoxOnClick = (target: any) => {
     let tempArr = [...checkedList];
@@ -139,7 +139,7 @@ export const Info = (props: Props) => {
           <div
             onClick={() => handleCheckAllButtonOnClick()}
             className="btn btn-primary shadow-0 "
-            style={{ backgroundColor: '#25d366', marginRight: '2px' }}
+            style={{ backgroundColor: '#25d366', margin: '2px' }}
           >
             <i className="fas fa-check"></i>
             &#160; {isCheckedAll !== true ? 'Chọn tất cả' : 'Bỏ chọn tất cả'}
@@ -149,14 +149,14 @@ export const Info = (props: Props) => {
             form="my-form"
             type="submit"
             className="btn btn-primary shadow-0 "
-            style={{ marginRight: '2px' }}
+            style={{ margin: '2px' }}
           >
             <i className="fas fa-arrow-circle-down"></i>
             &#160; Tải các chương đã chọn
           </button>
           <div
             className="btn btn-danger shadow-0"
-            style={{ marginLeft: '2px' }}
+            style={{ margin: '2px' }}
           >
             <i className="fas fa-arrow-circle-down"></i> &#160;Tải xuống toàn bộ
           </div>
