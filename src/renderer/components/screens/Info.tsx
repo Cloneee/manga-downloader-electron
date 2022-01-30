@@ -3,18 +3,15 @@ import React, { useEffect, useState } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { useForm, SubmitHandler } from 'react-hook-form';
 
-type Props = {};
-
-export const Info = (props: Props) => {
+export const Info = () => {
   const [searchParams] = useSearchParams();
-  let navigate = useNavigate();
+  const navigate = useNavigate();
   const link: string | null = searchParams.get('target');
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm();
-  const onSubmit: SubmitHandler<any> = (data) => console.log(checkedList);
 
   const [info, setinfo] = useState<IMangaInfo>();
   const [isCheckedAll, setisCheckedAll] = useState<boolean>(false);
@@ -22,23 +19,22 @@ export const Info = (props: Props) => {
     Array(info?.chapters.length).fill(false)
   );
   const handleCheckBoxOnClick = (target: any) => {
-    let tempArr = [...checkedList];
-    console.log(tempArr);
-    let tempTargetIndex = target.target.name;
+    const tempArr = [...checkedList];
+    const tempTargetIndex = target.target.name;
     if (tempArr[tempTargetIndex] === true) tempArr[tempTargetIndex] = false;
     else tempArr[tempTargetIndex] = true;
     setcheckedList(tempArr);
-    console.log(tempArr);
-    console.log(target.target.name);
   };
   useEffect(() => {
     const getMangaInfo = async () => {
-      const rawInfo = await window.electron.crawler.getInfo(link + '');
-      console.log(rawInfo);
-      setinfo(rawInfo);
+      if (link) {
+        const rawInfo: IMangaInfo = await window.electron.crawler.getInfo(link);
+        setinfo(rawInfo);
+      }
     };
     getMangaInfo();
-  }, []);
+  }, [link]);
+  const onSubmit: SubmitHandler<any> = (data) => console.log(checkedList);
 
   const exportListChapter = info?.chapters.map((chapter, index) => {
     return (
@@ -55,12 +51,30 @@ export const Info = (props: Props) => {
             className="form-check-input"
             type="checkbox"
             // name={index+''}
-            {...register(index + '')}
+            // eslint-disable-next-line react/jsx-props-no-spreading
+            {...register(String(index))}
             // value={true}
             checked={checkedList[index]}
             onClick={(target) => handleCheckBoxOnClick(target)}
           />
-          <strong onClick={()=> navigate(`/chapter?url=${chapter.url}&chapter=${chapter.chapter}&name=${info.name}&purl=${info.chapters[index-1].url}&pchapter=${info.chapters[index-1].chapter}&nurl=${info.chapters[index-1].url}&nchapter=${info.chapters[index-1].chapter}&mangaurl=${link}`)}>{chapter.chapter}</strong>
+          <strong
+            role="button"
+            tabIndex={0}
+            onClick={() =>
+              navigate(
+                `/chapter?url=${chapter.url}&chapter=${chapter.chapter}&name=${
+                  info.name
+                }&purl=${info.chapters[index - 1].url}&pchapter=${
+                  info.chapters[index - 1].chapter
+                }&nurl=${info.chapters[index - 1].url}&nchapter=${
+                  info.chapters[index - 1].chapter
+                }&mangaurl=${link}`
+              )
+            }
+            onKeyUp={() => {}}
+          >
+            {chapter.chapter}
+          </strong>
         </div>
       </div>
     );
@@ -75,22 +89,23 @@ export const Info = (props: Props) => {
     }
   };
   const handleDownloadAll = async () => {
-    await window.electron.crawler.download({
-      name: info?.name + '',
-      chapter: info?.chapters[0].chapter + '',
-      url: info?.chapters[0].url + '',
-    });
-    console.log({
-      name: info?.name + '',
-      chapter: info?.chapters[0].chapter + '',
-      url: info?.chapters[0].url + '',
-    });
+    if (info) {
+      await window.electron.crawler.download({
+        name: info?.name,
+        chapter: info?.chapters[0].chapter,
+        url: info?.chapters[0].url,
+      });
+    }
   };
 
   return (
     <div className="row text-center mt-4 px-4">
       <div className="col-lg-2 col-md-2 col-sm-12">
-        <img src={info?.thumbnail} style={{ width: '70%', height: 'auto' }} />
+        <img
+          src={info?.thumbnail}
+          style={{ width: '70%', height: 'auto' }}
+          alt="something"
+        />
       </div>
       <div className="col-lg-8 col-md-12 col-sm-12 text-start py-3 px-4">
         {' '}
@@ -101,7 +116,7 @@ export const Info = (props: Props) => {
               type="button"
               className="btn btn-primary btn-floating shadow-0  mx-4"
             >
-              <i className="fas fa-angle-left "></i>
+              <i className="fas fa-angle-left " />
             </button>
             <strong>
               {info?.name} ({info?.otherName})
@@ -117,9 +132,9 @@ export const Info = (props: Props) => {
         <div className="">
           <h6>
             Thể loại:{' '}
-            {info?.tag.map((tag, index) => {
+            {info?.tag.map((tag) => {
               return (
-                <div key={index} className="badge bg-primary mx-1">
+                <div key={tag} className="badge bg-primary mx-1">
                   {tag}
                 </div>
               );
@@ -142,14 +157,16 @@ export const Info = (props: Props) => {
           {exportListChapter}
         </div>
         <div className="col-12 my-4">
-          <div
+          <button
+            type="button"
             onClick={() => handleCheckAllButtonOnClick()}
             className="btn btn-primary shadow-0 "
             style={{ backgroundColor: '#25d366', margin: '2px' }}
+            onKeyUp={() => {}}
           >
-            <i className="fas fa-check"></i>
+            <i className="fas fa-check" />
             &#160; {isCheckedAll !== true ? 'Chọn tất cả' : 'Bỏ chọn tất cả'}
-          </div>
+          </button>
           <button
             onClick={() => handleDownloadAll()}
             form="my-form"
@@ -157,18 +174,21 @@ export const Info = (props: Props) => {
             className="btn btn-primary shadow-0 "
             style={{ margin: '2px' }}
           >
-            <i className="fas fa-arrow-circle-down"></i>
+            <i className="fas fa-arrow-circle-down" />
             &#160; Tải các chương đã chọn
           </button>
           <button
+            type="button"
             onClick={() => handleDownloadAll()}
             className="btn btn-danger shadow-0"
             style={{ margin: '2px' }}
           >
-            <i className="fas fa-arrow-circle-down"></i> &#160;Tải xuống toàn bộ
+            <i className="fas fa-arrow-circle-down" /> &#160;Tải xuống toàn bộ
           </button>
         </div>
       </form>
     </div>
   );
 };
+
+export default Info;
