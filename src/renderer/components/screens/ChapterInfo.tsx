@@ -43,13 +43,16 @@ export const ChapterInfo = () => {
         >
           <i className="fas fa-angle-left " />
         </button>
-        <span className="text-center col-10 py-3" style={{ color: 'white' }}>
-          <strong>
-            {name} | {chapter}
-          </strong>
-        </span>
       </div>
-      <div className="col-12 text-center my-4">
+      <h4
+        className="text-center col-10 py-2 mt-2 col-12"
+        style={{ color: 'black' }}
+      >
+        <strong>
+          {name} | {chapter}
+        </strong>
+      </h4>
+      <div className="col-12 text-center my-1">
         <button type="button" className="btn btn-danger shadow-0 px-4 mx-2">
           <i className="fas fa-angle-left" />
         </button>
