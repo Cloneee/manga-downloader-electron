@@ -59,7 +59,7 @@ ipcMain.handle('openFolder', async (_handler) => {
     // eslint-disable-next-line promise/catch-or-return
     result.then((res) => {
       if (!res.canceled) {
-        store.set('downloadFolder', res.filePaths);
+        store.set('downloadFolder', res.filePaths[0]);
       }
       resolve(res);
     });
