@@ -23,7 +23,8 @@ import {
   isMaximized,
   saveMaximized,
 } from './setting';
-import { search, getInfo } from './crawl';
+import { search, getInfo, downloadManga, getImageLinks } from './crawl';
+import { IMangaDownload } from '../interfaces';
 
 const store = new Store();
 
@@ -74,6 +75,14 @@ ipcMain.handle('search', async (_handler, mangaName) => {
 
 ipcMain.handle('getInfo', (_handler, mangaLink: string) => {
   return getInfo(mangaLink);
+});
+
+ipcMain.handle('getImages', (_handler, mangaChapter: IMangaDownload) => {
+  return getImageLinks(mangaChapter.url);
+});
+
+ipcMain.handle('download', (_handler, mangaChapter: IMangaDownload) => {
+  return downloadManga(mangaChapter, store.get('downloadFolder') as string);
 });
 
 if (process.env.NODE_ENV === 'production') {

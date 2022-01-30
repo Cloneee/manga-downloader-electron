@@ -4,7 +4,6 @@ interface IMangaSearchList {
   bgurl: string;
 }
 interface IMangaInfo {
-  mangaInfo: any;
   name: string;
   tag: string[];
   author: string;
@@ -21,5 +20,10 @@ interface IFolderPath {
   canceled: boolean;
   filePaths: [string];
 }
+interface IMangaDownload {
+  name: string;
+  chapter: string;
+  url: string;
+}
 
-export { IMangaSearchList, IMangaInfo, IFolderPath };
+export { IMangaSearchList, IMangaInfo, IFolderPath, IMangaDownload };

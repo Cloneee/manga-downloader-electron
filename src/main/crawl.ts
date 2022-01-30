@@ -1,15 +1,23 @@
+/* eslint-disable promise/catch-or-return */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import axios from 'axios';
 import cheerio from 'cheerio';
-import { IMangaSearchList, IMangaInfo } from '../interfaces';
+import path from 'path';
+import fs from 'fs';
+import https from 'https';
+import { IMangaSearchList, IMangaInfo, IMangaDownload } from '../interfaces';
+
+const createDir = (dir: string) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir);
+  }
+};
 
 const search = async (mangaName: string) => {
-  let mangaList: IMangaSearchList[];
-  // eslint-disable-next-line prefer-const
-  mangaList = [];
+  const mangaList = [] as IMangaSearchList[];
   const resp = await axios.get(
-    `https://truyentranhlh.net/tim-kiem?q=${mangaName}`
+    `https://truyentranhlh.net/tim-kiem?q=${encodeURI(mangaName)}`
   );
   const $ = cheerio.load(resp.data);
   $('.thumb-item-flow').each((_index, el) => {
@@ -75,4 +83,56 @@ const getInfo = async (mangaLink: string) => {
   return mangaInfo;
 };
 
-export { search, getInfo };
+const getImageLinks = async (chapterLink: string) => {
+  const resp = await axios.get(chapterLink);
+  const $ = cheerio.load(resp.data);
+  const result = $('#chapter-content > img')
+    .toArray()
+    .map((el) => $(el).attr('data-src'));
+  return result;
+};
+
+const download = (
+  url: string | undefined,
+  name: string,
+  chapter: string,
+  index: number,
+  DIR: string
+) => {
+  return new Promise<void>((resolve) => {
+    https.get(url as string, (resp) => {
+      const fileStream = fs.createWriteStream(
+        path.join(DIR, name, chapter, `${index}.jpg`)
+      );
+      resp.pipe(fileStream);
+      fileStream.on('finish', () => {
+        fileStream.close();
+        resolve();
+      });
+    });
+  });
+};
+
+const downloadManga = async (mangaChapter: IMangaDownload, DIR: string) => {
+  const images = await getImageLinks(mangaChapter.url);
+  images.pop();
+  const chapterList = [] as Promise<void>[];
+  createDir(path.join(DIR, mangaChapter.name));
+  createDir(path.join(DIR, mangaChapter.name, mangaChapter.chapter));
+  return new Promise<void>((resolve) => {
+    for (let index = 0; index < images.length; index += 1) {
+      chapterList.push(
+        download(
+          images[index],
+          mangaChapter.name,
+          mangaChapter.chapter,
+          index + 1,
+          DIR
+        )
+      );
+    }
+    Promise.all(chapterList).then(() => resolve());
+  });
+};
+
+export { search, getInfo, downloadManga, getImageLinks };

@@ -41,5 +41,11 @@ contextBridge.exposeInMainWorld('electron', {
     getInfo(mangaLink) {
       return ipcRenderer.invoke('getInfo', mangaLink);
     },
+    getImages(mangaChapter) {
+      return ipcRenderer.invoke('getImages', mangaChapter);
+    },
+    download(mangaChapter) {
+      return ipcRenderer.invoke('downloadChapter', mangaChapter);
+    },
   },
 });
