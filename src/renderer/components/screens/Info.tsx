@@ -99,9 +99,10 @@ export const Info = () => {
   };
   const handleDownloadAll = async () => {
     if (info) {
-      info.chapters.forEach(async (chapter) => {
-        await downLoadChapter(chapter);
-      });
+      for (let i = 0; i < info.chapters.length; i += 1) {
+        // eslint-disable-next-line no-await-in-loop
+        await downLoadChapter(info.chapters[i]);
+      }
     }
   };
 

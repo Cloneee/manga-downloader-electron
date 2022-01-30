@@ -1,3 +1,5 @@
+/* eslint-disable no-console */
+/* eslint-disable no-useless-escape */
 /* eslint-disable promise/catch-or-return */
 /* eslint-disable prefer-destructuring */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
@@ -117,19 +119,13 @@ const downloadManga = async (mangaChapter: IMangaDownload, DIR: string) => {
   const images = await getImageLinks(mangaChapter.url);
   images.pop();
   const chapterList = [] as Promise<void>[];
-  createDir(path.join(DIR, mangaChapter.name));
-  createDir(path.join(DIR, mangaChapter.name, mangaChapter.chapter));
+  const name = mangaChapter.name.replace(/[\*\\\/\:\?\"\<\>\|]+/g, '');
+  const chapter = mangaChapter.chapter.replace(/[\*\\\/\:\?\"\<\>\|]+/g, '');
+  createDir(path.join(DIR, name));
+  createDir(path.join(DIR, name, chapter));
   return new Promise<void>((resolve) => {
     for (let index = 0; index < images.length; index += 1) {
-      chapterList.push(
-        download(
-          images[index],
-          mangaChapter.name,
-          mangaChapter.chapter,
-          index + 1,
-          DIR
-        )
-      );
+      chapterList.push(download(images[index], name, chapter, index + 1, DIR));
     }
     Promise.all(chapterList).then(() => resolve());
   });
