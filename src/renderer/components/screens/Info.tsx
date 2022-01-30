@@ -8,15 +8,14 @@ type Props = {};
 export const Info = (props: Props) => {
   const [searchParams] = useSearchParams();
   let navigate = useNavigate();
+  const link: string | null = searchParams.get('target');
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm();
   const onSubmit: SubmitHandler<any> = (data) => console.log(checkedList);
 
-  const link: string | null = searchParams.get('target');
   const [info, setinfo] = useState<IMangaInfo>();
   const [isCheckedAll, setisCheckedAll] = useState<boolean>(false);
   const [checkedList, setcheckedList] = useState<boolean[]>(
@@ -24,12 +23,12 @@ export const Info = (props: Props) => {
   );
   const handleCheckBoxOnClick = (target: any) => {
     let tempArr = [...checkedList];
-    console.log(tempArr)
+    console.log(tempArr);
     let tempTargetIndex = target.target.name;
     if (tempArr[tempTargetIndex] === true) tempArr[tempTargetIndex] = false;
     else tempArr[tempTargetIndex] = true;
     setcheckedList(tempArr);
-    console.log(tempArr)
+    console.log(tempArr);
     console.log(target.target.name);
   };
   useEffect(() => {
@@ -39,7 +38,6 @@ export const Info = (props: Props) => {
       setinfo(rawInfo);
     };
     getMangaInfo();
-   
   }, []);
 
   const exportListChapter = info?.chapters.map((chapter, index) => {
@@ -49,38 +47,46 @@ export const Info = (props: Props) => {
           index % 2 === 0 ? 'bg-light border text-start ' : 'border text-start '
         }
         key={chapter.chapter}
-        style={{ paddingLeft: '45%' }}
+        style={{ paddingLeft: '45%', cursor: 'pointer' }}
       >
         <div>
           {' '}
-          <strong>
-            {' '}
-            <input
-              className="form-check-input"
-              type="checkbox"
-              // name={index+''}
-              {...register(index + '')}
-              // value={true}
-              checked={checkedList[index]}
-              onClick={(target) => handleCheckBoxOnClick(target)}
-            />
-            {chapter.chapter}
-          </strong>
+          <input
+            className="form-check-input"
+            type="checkbox"
+            // name={index+''}
+            {...register(index + '')}
+            // value={true}
+            checked={checkedList[index]}
+            onClick={(target) => handleCheckBoxOnClick(target)}
+          />
+          <strong onClick={()=> navigate(`/chapter?url=${chapter.url}&chapter=${chapter.chapter}&name=${info.name}&purl=${info.chapters[index-1].url}&pchapter=${info.chapters[index-1].chapter}&nurl=${info.chapters[index-1].url}&nchapter=${info.chapters[index-1].chapter}&mangaurl=${link}`)}>{chapter.chapter}</strong>
         </div>
       </div>
     );
   });
   const handleCheckAllButtonOnClick = () => {
     if (isCheckedAll === true) {
-      setisCheckedAll(false)
-      setcheckedList( Array(info?.chapters.length).fill(false))
-    }
-    else{
+      setisCheckedAll(false);
+      setcheckedList(Array(info?.chapters.length).fill(false));
+    } else {
       setisCheckedAll(true);
-      setcheckedList( Array(info?.chapters.length).fill(true))
-
-    } 
+      setcheckedList(Array(info?.chapters.length).fill(true));
+    }
   };
+  const handleDownloadAll = async () => {
+    await window.electron.crawler.download({
+      name: info?.name + '',
+      chapter: info?.chapters[0].chapter + '',
+      url: info?.chapters[0].url + '',
+    });
+    console.log({
+      name: info?.name + '',
+      chapter: info?.chapters[0].chapter + '',
+      url: info?.chapters[0].url + '',
+    });
+  };
+
   return (
     <div className="row text-center mt-4 px-4">
       <div className="col-lg-2 col-md-2 col-sm-12">
@@ -145,7 +151,7 @@ export const Info = (props: Props) => {
             &#160; {isCheckedAll !== true ? 'Chọn tất cả' : 'Bỏ chọn tất cả'}
           </div>
           <button
-            //   onClick={()=> handleViewManga()}
+            onClick={() => handleDownloadAll()}
             form="my-form"
             type="submit"
             className="btn btn-primary shadow-0 "
@@ -154,12 +160,13 @@ export const Info = (props: Props) => {
             <i className="fas fa-arrow-circle-down"></i>
             &#160; Tải các chương đã chọn
           </button>
-          <div
+          <button
+            onClick={() => handleDownloadAll()}
             className="btn btn-danger shadow-0"
             style={{ margin: '2px' }}
           >
             <i className="fas fa-arrow-circle-down"></i> &#160;Tải xuống toàn bộ
-          </div>
+          </button>
         </div>
       </form>
     </div>

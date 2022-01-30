@@ -23,7 +23,7 @@ interface IFolderPath {
 interface IMangaDownload {
   name: string;
   chapter: string;
-  url: string;
+  url: string ;
 }
 
 export { IMangaSearchList, IMangaInfo, IFolderPath, IMangaDownload };

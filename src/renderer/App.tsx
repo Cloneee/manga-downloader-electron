@@ -10,6 +10,7 @@ import { IMangaSearchList, IFolderPath, IMangaInfo, IMangaDownload } from '../in
 import icon from '../../assets/icon.svg';
 import { ResultCard } from './components/common/ResultCard';
 import { Info } from './components/screens/Info';
+import { ChapterInfo } from './components/screens/ChapterInfo';
 
 declare global {
   interface Window {
@@ -125,6 +126,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Hello />} />
         <Route path="/info" element={<Info />} />
+        <Route path="/chapter" element={<ChapterInfo />} />
       </Routes>
     </Router>
   );
