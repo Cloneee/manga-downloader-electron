@@ -34,7 +34,7 @@ export const Info = () => {
     };
     getMangaInfo();
   }, [link]);
-  const onSubmit: SubmitHandler<any> = (data) => console.log(checkedList);
+  // const onSubmit: SubmitHandler<any> = (data) => console.log(checkedList);
 
   const exportListChapter = info?.chapters.map((chapter, index) => {
     return (
@@ -88,12 +88,19 @@ export const Info = () => {
       setcheckedList(Array(info?.chapters.length).fill(true));
     }
   };
-  const handleDownloadAll = async () => {
+  const downLoadChapter = async (chapter: any) => {
     if (info) {
       await window.electron.crawler.download({
         name: info?.name,
-        chapter: info?.chapters[0].chapter,
-        url: info?.chapters[0].url,
+        chapter: chapter.chapter,
+        url: chapter.url,
+      });
+    }
+  };
+  const handleDownloadAll = async () => {
+    if (info) {
+      info.chapters.forEach(async (chapter) => {
+        await downLoadChapter(chapter);
       });
     }
   };
@@ -149,7 +156,7 @@ export const Info = () => {
           </div>
         </div>
       </div>
-      <form onSubmit={handleSubmit(onSubmit)} id="my-form">
+      <form id="my-form">
         <div
           className="col-12  "
           style={{ height: '50vh', color: 'black', overflow: 'auto' }}
