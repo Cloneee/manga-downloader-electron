@@ -25,5 +25,15 @@ interface IMangaDownload {
   chapter: string;
   url: string;
 }
+interface IMangaLocal {
+  name: string;
+  chapters: string[];
+}
 
-export { IMangaSearchList, IMangaInfo, IFolderPath, IMangaDownload };
+export {
+  IMangaSearchList,
+  IMangaInfo,
+  IFolderPath,
+  IMangaDownload,
+  IMangaLocal,
+};

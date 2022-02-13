@@ -8,7 +8,7 @@ import cheerio from 'cheerio';
 import path from 'path';
 import fs from 'fs';
 import https from 'https';
-import { IMangaSearchList, IMangaInfo, IMangaDownload } from '../interfaces';
+import { IMangaSearchList, IMangaInfo, IMangaDownload } from '../../interfaces';
 
 const createDir = (dir: string) => {
   if (!fs.existsSync(dir)) {
