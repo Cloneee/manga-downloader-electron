@@ -48,4 +48,15 @@ contextBridge.exposeInMainWorld('electron', {
       return ipcRenderer.invoke('download', mangaChapter);
     },
   },
+  localManga: {
+    listManga(dir) {
+      return ipcRenderer.invoke('listManga', dir);
+    },
+    loadList() {
+      return ipcRenderer.invoke('loadList');
+    },
+    loadImages(name, chapter) {
+      return ipcRenderer.invoke('loadImages', name, chapter);
+    },
+  },
 });

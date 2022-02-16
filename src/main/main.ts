@@ -22,9 +22,15 @@ import {
   saveBounds,
   isMaximized,
   saveMaximized,
-} from './setting';
-import { search, getInfo, downloadManga, getImageLinks } from './crawl';
-import { IMangaDownload } from '../interfaces';
+} from './controller/setting';
+import {
+  search,
+  getInfo,
+  downloadManga,
+  getImageLinks,
+} from './controller/crawl';
+import { mangaList, loadList, loadImages } from './controller/local';
+import { IMangaDownload, IMangaLocal } from '../interfaces';
 
 const store = new Store();
 
@@ -84,6 +90,21 @@ ipcMain.handle('getImages', (_handler, mangaChapter: IMangaDownload) => {
 ipcMain.handle('download', (_handler, mangaChapter: IMangaDownload) => {
   return downloadManga(mangaChapter, store.get('downloadFolder') as string);
 });
+ipcMain.handle('listManga', (_handler, dir: string) => {
+  return new Promise<IMangaLocal[]>((resolve) => {
+    resolve(mangaList(dir));
+  });
+});
+ipcMain.handle('loadList', () => {
+  return loadList();
+});
+ipcMain.handle(
+  'loadImages',
+  async (_handler, name: string, chapter: string) => {
+    const savePath = (await store.get('downloadFolder')) as string;
+    return loadImages(savePath, name, chapter);
+  }
+);
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
