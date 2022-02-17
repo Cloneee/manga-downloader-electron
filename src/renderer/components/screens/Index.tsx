@@ -1,49 +1,12 @@
-/* eslint-disable react/no-array-index-key */
-/* eslint-disable react/self-closing-comp */
-/* eslint-disable no-useless-return */
-/* eslint-disable @typescript-eslint/no-use-before-define */
-/* eslint-disable prettier/prettier */
-/* eslint-disable no-console */
 import FolderIcon from '@mui/icons-material/Folder';
 import SearchIcon from '@mui/icons-material/Search';
 import { Box, Button, Grid, TextField } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
-import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
-import '../assets/css/styles.css';
-import {
-  IFolderPath,
-  IMangaDownload,
-  IMangaInfo,
-  IMangaSearchList,
-} from '../interfaces';
-import { Menu } from './components/common/Menu';
-import { ResultCard } from './components/common/ResultCard';
-import { ChapterInfo } from './components/screens/ChapterInfo';
-import { Index } from './components/screens/Index';
-import { Info } from './components/screens/MangaInfo';
+import { IMangaSearchList } from '../../../interfaces';
+import { Menu } from '../common/Menu';
+import { ResultCard } from '../common/ResultCard';
 
-declare global {
-  interface Window {
-    electron: {
-      store: {
-        get: (key: string) => any;
-        set: (key: string, val: any) => void;
-        // any other methods you've defined...
-      };
-      openDialog: {
-        open: () => Promise<IFolderPath>;
-      };
-      crawler: {
-        search: (mangaName: string) => Promise<IMangaSearchList[]>;
-        getInfo: (mangaLink: string) => Promise<IMangaInfo>;
-        getImages: (mangaChapter: IMangaDownload) => Promise<string[]>;
-        download: (mangaChaper: IMangaDownload) => Promise<void>;
-      };
-    };
-  }
-}
-
-const Hello = () => {
+export const Index = () => {
   const [search, setSearch] = useState('');
   const [results, setresults] = useState<IMangaSearchList[]>([]);
   const [path, setpath] = useState('');
@@ -61,6 +24,11 @@ const Hello = () => {
       setpath(window.electron.store.get('savePath'));
     }
   };
+  const handleSearch = async () => {
+    const result = await window.electron.crawler.search(search);
+    // console.log(result);
+    setresults(result);
+  };
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
 
@@ -73,15 +41,18 @@ const Hello = () => {
       typingTimeoutRef.current = setTimeout(() => {
         handleSearch();
       }, 300);
-    } else return;
+    }
   };
-  const handleSearch = async () => {
-    const result = await window.electron.crawler.search(search);
-    // console.log(result);
-    setresults(result);
-  };
+
   return (
     <Grid container direction="row" alignItems="flex-start" pt={1}>
+      <img
+        src="https://mir-s3-cdn-cf.behance.net/project_modules/fs/242e73121940413.61add7ea6286e.png"
+        alt="anime"
+        loading="lazy"
+        style={{ width: '100%' }}
+      />
+
       <Grid xs={2} ml={1} className="bg-component--dark">
         <Menu />
       </Grid>
@@ -96,7 +67,6 @@ const Hello = () => {
             sx={{ width: '50%' }}
             onChange={handleSearchChange}
           />
-
           <Button
             sx={{ paddingInline: '2em', marginInline: '1em' }}
             onClick={handleSearch}
@@ -109,9 +79,11 @@ const Hello = () => {
             className="btn__primary"
             onClick={handleGetDownloadPath}
             variant="contained"
+            sx={{ paddingInline: '2em', marginInline: '1em' }}
           >
             <FolderIcon /> Đường dẫn
           </Button>
+          ... {path.substring(path.length - 15, path.length)}
         </Box>
 
         <Box className="bg-component--dark" pl={1} p={2} mt={1}>
@@ -124,7 +96,7 @@ const Hello = () => {
                   xs={3}
                   rowSpacing={2}
                   columnSpacing={{ xs: 1, sm: 2, md: 3 }}
-                  key={index}
+                  key={item.bgurl}
                 >
                   <ResultCard item={item} />
                 </Grid>
@@ -134,25 +106,15 @@ const Hello = () => {
         </Box>
       </Grid>
       {/* <div className="col-12 d-flex justify-content-center ">
-        <strong>{results.length} &#160;</strong> Kết quả | Đường dẫn: &#160;
-        <strong>
-          {path !== ''
-            ? `...${path.substring(path.length - 15, path.length)}`
-            : 'Chưa chọn'}
-        </strong>
-      </div> */}
+          <strong>{results.length} &#160;</strong> Kết quả | Đường dẫn: &#160;
+          <strong>
+            {path !== ''
+              ? `...${path.substring(path.length - 15, path.length)}`
+              : 'Chưa chọn'}
+          </strong>
+        </div> */}
     </Grid>
   );
 };
 
-export default function App() {
-  return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/info" element={<Info />} />
-        <Route path="/chapter" element={<ChapterInfo />} />
-      </Routes>
-    </Router>
-  );
-}
+export default Index;

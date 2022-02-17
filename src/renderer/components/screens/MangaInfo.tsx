@@ -1,12 +1,17 @@
+import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
+import { Box, Button, Checkbox, Chip, Grid } from '@mui/material';
 import { IMangaInfo } from 'interfaces';
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
-import { useForm, SubmitHandler } from 'react-hook-form';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { DownloadBar } from '../common/DownloadBar';
 
 export const Info = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const link: string | null = searchParams.get('target');
+  const [percentComplete, setpercentComplete] = useState<number>(0);
+  const [downloadStatus, setdownloadStatus] = useState<string>('Đang bắt đầu');
   const {
     register,
     handleSubmit,
@@ -47,9 +52,7 @@ export const Info = () => {
       >
         <div>
           {' '}
-          <input
-            className="form-check-input"
-            type="checkbox"
+          <Checkbox
             // name={index+''}
             // eslint-disable-next-line react/jsx-props-no-spreading
             {...register(String(index))}
@@ -102,37 +105,38 @@ export const Info = () => {
       for (let i = 0; i < info.chapters.length; i += 1) {
         // eslint-disable-next-line no-await-in-loop
         await downLoadChapter(info.chapters[i]);
+        setdownloadStatus(`Đã tải ${i - 1} / ${info.chapters.length}`);
+        setpercentComplete(Math.floor((i / (info.chapters.length - 1)) * 100));
       }
     }
   };
 
   return (
-    <div className="row text-center mt-4 px-4">
-      <div className="col-lg-2 col-md-2 col-sm-12">
-        <img
-          src={info?.thumbnail}
-          style={{ width: '70%', height: 'auto' }}
-          alt="something"
-        />
-      </div>
-      <div className="col-lg-8 col-md-12 col-sm-12 text-start py-3 px-4">
+    <Grid container spacing={2}>
+      <Grid xs={3}>
+        <img src={info?.thumbnail} style={{ width: '90%' }} alt="something" />
+      </Grid>
+
+      <Grid xs={9}>
         {' '}
-        <div>
+        <Box>
           <h3>
-            <button
+            <Button
               onClick={() => navigate('/')}
-              type="button"
-              className="btn btn-primary btn-floating shadow-0  mx-4"
+              // type="button"
+              // className="btn__primary"
             >
-              <i className="fas fa-angle-left " />
-            </button>
+              <ArrowLeftIcon fontSize="large" />
+            </Button>
             <strong>
               {info?.name} ({info?.otherName})
             </strong>
           </h3>
-        </div>
+        </Box>
         <div>
-          <h6>Tác giả: {info?.author}</h6>
+          <h6>
+            Tác giả: {info?.author} {percentComplete}
+          </h6>
         </div>
         <div>
           <h6>Trạng thái: {info?.status}</h6>
@@ -142,9 +146,12 @@ export const Info = () => {
             Thể loại:{' '}
             {info?.tag.map((tag) => {
               return (
-                <div key={tag} className="badge bg-primary mx-1">
-                  {tag}
-                </div>
+                <Chip
+                  sx={{ marginInlineEnd: '.5em', marginInlineStart: '.5em' }}
+                  label={tag}
+                  key={tag}
+                  color="primary"
+                />
               );
             })}
           </h6>
@@ -156,7 +163,7 @@ export const Info = () => {
             </p>
           </div>
         </div>
-      </div>
+      </Grid>
       <form id="my-form">
         <div
           className="col-12  "
@@ -165,37 +172,37 @@ export const Info = () => {
           {exportListChapter}
         </div>
         <div className="col-12 my-4">
-          <button
+          <Button
             type="button"
             onClick={() => handleCheckAllButtonOnClick()}
-            className="btn btn-primary shadow-0 "
             style={{ backgroundColor: '#25d366', margin: '2px' }}
             onKeyUp={() => {}}
           >
             <i className="fas fa-check" />
             &#160; {isCheckedAll !== true ? 'Chọn tất cả' : 'Bỏ chọn tất cả'}
-          </button>
-          <button
+          </Button>
+          <Button
             onClick={() => handleDownloadAll()}
             form="my-form"
             type="submit"
-            className="btn btn-primary shadow-0 "
             style={{ margin: '2px' }}
           >
             <i className="fas fa-arrow-circle-down" />
             &#160; Tải các chương đã chọn
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
             onClick={() => handleDownloadAll()}
-            className="btn btn-danger shadow-0"
             style={{ margin: '2px' }}
           >
             <i className="fas fa-arrow-circle-down" /> &#160;Tải xuống toàn bộ
-          </button>
+          </Button>
         </div>
       </form>
-    </div>
+      <Grid xs={12} sx={{ height: '70px' }} />
+      {percentComplete}
+      <DownloadBar status={downloadStatus} value={percentComplete} />
+    </Grid>
   );
 };
 

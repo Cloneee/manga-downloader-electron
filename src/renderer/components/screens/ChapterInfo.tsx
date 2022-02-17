@@ -1,5 +1,6 @@
+import { Button, Grid } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export const ChapterInfo = () => {
   const [searchParams] = useSearchParams();
@@ -31,49 +32,38 @@ export const ChapterInfo = () => {
     getMangaInfo();
   }, [chapter, name, link]);
   return (
-    <div className="row  text-center">
-      <div
-        className="col-12 bg-danger text-start row "
-        style={{ height: '3em' }}
-      >
-        <button
+    <Grid container direction="row" sx={{ color: 'white' }}>
+      <Grid item xs={12} alignItems="center">
+        <Button
           onClick={() => navigate(`/info?target=${mangaUrl}`)}
           type="button"
-          className="btn btn-danger btn-floating btn-lg shadow-0  mx-4 col-2"
+          className=""
         >
-          <i className="fas fa-angle-left " />
-        </button>
-      </div>
-      <h4
-        className="text-center col-10 py-2 mt-2 col-12"
-        style={{ color: 'black' }}
-      >
+          Quay lại
+        </Button>
         <strong>
           {name} | {chapter}
         </strong>
-      </h4>
-      <div className="col-12 text-center my-1">
-        <button type="button" className="btn btn-danger shadow-0 px-4 mx-2">
-          <i className="fas fa-angle-left" />
-        </button>
-        <button type="button" className="btn btn-danger shadow-0 px-4 mx-2">
-          <i className="fas fa-angle-right" />
-        </button>
-      </div>
-      <div className="col-lg-3 col-md-2 col-sm-0" />
-      <div className="col-lg-6 col-md-8 col-sm-12 my-4">
+      </Grid>
+      <Grid xs={12} sx={{ justifyContent: 'center' }}>
+        <Button className="">Chương trước </Button>
+        <Button className="">Chương sau </Button>
+      </Grid>
+      <Grid xs={3} />
+      <Grid xs={6}>
         {listImageLink.map((url) => {
           return (
             <img
               src={url}
               key={url}
-              style={{ width: '100%', height: 'auto' }}
-              alt="jcndkjsncs"
+              style={{ width: '100%', height: 'auto', marginBottom: '1em' }}
+              alt="i"
             />
           );
         })}
-      </div>
-    </div>
+      </Grid>
+      <Grid xs={3} />
+    </Grid>
   );
 };
 export default ChapterInfo;
