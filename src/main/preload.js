@@ -35,8 +35,8 @@ contextBridge.exposeInMainWorld('electron', {
     },
   },
   crawler: {
-    search(mangaName) {
-      return ipcRenderer.invoke('search', mangaName);
+    search(mangaName, page) {
+      return ipcRenderer.invoke('search', mangaName, page);
     },
     getInfo(mangaLink) {
       return ipcRenderer.invoke('getInfo', mangaLink);

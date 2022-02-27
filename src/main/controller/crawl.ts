@@ -16,10 +16,12 @@ const createDir = (dir: string) => {
   }
 };
 
-const search = async (mangaName: string) => {
+const search = async (mangaName: string, page: number) => {
   const mangaList = [] as IMangaSearchList[];
   const resp = await axios.get(
-    `https://truyentranhlh.net/tim-kiem?q=${encodeURI(mangaName)}`
+    `https://truyentranhlh.net/tim-kiem?q=${encodeURI(
+      mangaName
+    )}&page=${page.toString()}`
   );
   const $ = cheerio.load(resp.data);
   $('.thumb-item-flow').each((_index, el) => {

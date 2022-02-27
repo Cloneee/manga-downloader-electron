@@ -63,8 +63,8 @@ ipcMain.on('ipc-example', async (event, arg) => {
 });
 
 // Crawl
-ipcMain.handle('search', async (_handler, mangaName) => {
-  return search(mangaName);
+ipcMain.handle('search', async (_handler, mangaName, page) => {
+  return search(mangaName, page);
 });
 
 ipcMain.handle('getInfo', (_handler, mangaLink: string) => {
@@ -80,7 +80,7 @@ ipcMain.handle('download', (_handler, mangaChapter: IMangaDownload) => {
 });
 
 // Local
-ipcMain.handle('openFolder', async (_handler) => openFolder());
+ipcMain.handle('openFolder', async () => openFolder());
 ipcMain.handle('listManga', (_handler, dir: string) => {
   return new Promise<IMangaLocal[]>((resolve) => {
     resolve(mangaList(dir));
