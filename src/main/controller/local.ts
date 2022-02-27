@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import Store from 'electron-store';
+import { dialog } from 'electron';
 import { IMangaLocal } from '../../interfaces';
 
 const store = new Store();
@@ -30,7 +31,27 @@ const loadList = () => {
 const loadImages = async (dir: string, name: string, chapter: string) => {
   const imagesPath = path.join(dir, name, chapter);
   const result = fs.readdirSync(imagesPath);
-  return result;
+  const imagesOnly = result.filter(
+    (value) => path.extname(value) in ['.jpg', '.jpeg', '.png']
+  );
+  return imagesOnly;
+};
+const openFolder = () => {
+  return new Promise((resolve, reject) => {
+    const result = dialog.showOpenDialog({
+      properties: ['openDirectory'],
+    });
+    // eslint-disable-next-line promise/catch-or-return
+    result.then((res) => {
+      if (!res.canceled) {
+        store.set('downloadFolder', res.filePaths[0]);
+      }
+      return resolve(res);
+    });
+    result.catch((err) => {
+      reject(err);
+    });
+  });
 };
 
-export { mangaList, loadList, loadImages };
+export { mangaList, loadList, loadImages, openFolder };

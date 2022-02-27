@@ -11,7 +11,7 @@
 import 'core-js/stable';
 import 'regenerator-runtime/runtime';
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain, dialog } from 'electron';
+import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import Store from 'electron-store';
@@ -29,7 +29,12 @@ import {
   downloadManga,
   getImageLinks,
 } from './controller/crawl';
-import { mangaList, loadList, loadImages } from './controller/local';
+import {
+  mangaList,
+  loadList,
+  loadImages,
+  openFolder,
+} from './controller/local';
 import { IMangaDownload, IMangaLocal } from '../interfaces';
 
 const store = new Store();
@@ -57,24 +62,7 @@ ipcMain.on('ipc-example', async (event, arg) => {
   event.reply('ipc-example', msgTemplate('pong'));
 });
 
-ipcMain.handle('openFolder', async (_handler) => {
-  return new Promise((resolve, reject) => {
-    const result = dialog.showOpenDialog({
-      properties: ['openDirectory'],
-    });
-    // eslint-disable-next-line promise/catch-or-return
-    result.then((res) => {
-      if (!res.canceled) {
-        store.set('downloadFolder', res.filePaths[0]);
-      }
-      resolve(res);
-    });
-    result.catch((err) => {
-      reject(err);
-    });
-  });
-});
-
+// Crawl
 ipcMain.handle('search', async (_handler, mangaName) => {
   return search(mangaName);
 });
@@ -90,6 +78,9 @@ ipcMain.handle('getImages', (_handler, mangaChapter: IMangaDownload) => {
 ipcMain.handle('download', (_handler, mangaChapter: IMangaDownload) => {
   return downloadManga(mangaChapter, store.get('downloadFolder') as string);
 });
+
+// Local
+ipcMain.handle('openFolder', async (_handler) => openFolder());
 ipcMain.handle('listManga', (_handler, dir: string) => {
   return new Promise<IMangaLocal[]>((resolve) => {
     resolve(mangaList(dir));

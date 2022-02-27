@@ -103,8 +103,9 @@ const download = (
 ) => {
   return new Promise<void>((resolve) => {
     https.get(url as string, (resp) => {
+      const newIndex = `000${index}`.substr(-3);
       const fileStream = fs.createWriteStream(
-        path.join(DIR, name, chapter, `${index}.jpg`)
+        path.join(DIR, name, chapter, `${newIndex}.jpg`)
       );
       resp.pipe(fileStream);
       fileStream.on('finish', () => {
