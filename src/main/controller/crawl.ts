@@ -72,8 +72,9 @@ const getInfo = async (mangaLink: string) => {
   });
   const style = $('.series-cover > div > div').attr('style') || '';
   const imgurl = style.match(/url\(["']?([^"']*)["']?\)/);
-  // eslint-disable-next-line prettier/prettier
-  imgurl ? (mangaInfo.thumbnail = imgurl[1]) : null;
+  if (imgurl) {
+    mangaInfo.thumbnail = imgurl[1];
+  }
   mangaInfo.summary = $('div.summary-content > p').text() || '';
   const chapters = $('.list-chapters.at-series > a')
     .toArray()

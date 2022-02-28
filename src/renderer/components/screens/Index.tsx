@@ -1,6 +1,13 @@
 import FolderIcon from '@mui/icons-material/Folder';
 import SearchIcon from '@mui/icons-material/Search';
-import { Box, Button, Grid, TextField } from '@mui/material';
+import {
+  Box,
+  Button,
+  Grid,
+  TextField,
+  InputAdornment,
+  Typography,
+} from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { IMangaSearchList } from '../../../interfaces';
 import { Menu } from '../common/Menu';
@@ -10,11 +17,16 @@ export const Index = () => {
   const [search, setSearch] = useState('');
   const [results, setresults] = useState<IMangaSearchList[]>([]);
   const [path, setpath] = useState('');
+  const [page, setPage] = useState(1);
   const typingTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   useEffect(() => {
     if (window.electron.store.get('savePath')) {
       setpath(window.electron.store.get('savePath'));
     }
+    window.electron.crawler
+      .search('', 1)
+      .then((result) => setresults(result))
+      .catch((e) => console.log(e));
   }, []);
 
   const handleGetDownloadPath = async () => {
@@ -25,7 +37,7 @@ export const Index = () => {
     }
   };
   const handleSearch = async () => {
-    const result = await window.electron.crawler.search(search);
+    const result = await window.electron.crawler.search(search, page);
     // console.log(result);
     setresults(result);
   };
@@ -40,54 +52,58 @@ export const Index = () => {
     if (e.target.value) {
       typingTimeoutRef.current = setTimeout(() => {
         handleSearch();
+        setPage(1);
       }, 300);
     }
   };
 
   return (
     <Grid container direction="row" alignItems="flex-start" pt={1}>
-      <img
-        src="https://mir-s3-cdn-cf.behance.net/project_modules/fs/242e73121940413.61add7ea6286e.png"
-        alt="anime"
-        loading="lazy"
-        style={{ width: '100%' }}
-      />
-
       <Grid xs={2} ml={1} className="bg-component--dark">
         <Menu />
       </Grid>
       <Grid xs={9} ml={1}>
-        <Box className="bg-component--dark" p={2}>
+        <Box className="bg-component--dark" p={2} sx={{ display: 'flex' }}>
           <TextField
             type="text"
             id="search-bar"
             variant="outlined"
             size="small"
             label="Tìm kiếm"
-            sx={{ width: '50%' }}
+            sx={{ width: '50%', flexShrink: 0 }}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <SearchIcon />
+                </InputAdornment>
+              ),
+            }}
             onChange={handleSearchChange}
           />
-          <Button
-            sx={{ paddingInline: '2em', marginInline: '1em' }}
-            onClick={handleSearch}
-            variant="contained"
-            className="btn__primary"
-          >
-            <SearchIcon /> Tìm
-          </Button>
           <Button
             className="btn__primary"
             onClick={handleGetDownloadPath}
             variant="contained"
-            sx={{ paddingInline: '2em', marginInline: '1em' }}
+            sx={{ paddingInline: '2em', marginInline: '1em', flexShrink: 0 }}
           >
             <FolderIcon /> Đường dẫn
           </Button>
-          ... {path.substring(path.length - 15, path.length)}
+          <Typography
+            component="span"
+            noWrap
+            align="left"
+            sx={{ flexShrink: 1 }}
+          >
+            {path}
+          </Typography>
         </Box>
 
         <Box className="bg-component--dark" pl={1} p={2} mt={1}>
-          <Box pb={1}>Kết quả</Box>
+          <Box pb={1}>
+            <Typography variant="h4" component="h2">
+              Truyện mới cập nhập
+            </Typography>
+          </Box>
           <Grid container spacing={2}>
             {results.map((item: IMangaSearchList, index) => {
               return (
@@ -104,15 +120,27 @@ export const Index = () => {
             })}
           </Grid>
         </Box>
+        <Box
+          className="bg-component--dark"
+          pl={1}
+          p={2}
+          mt={1}
+          sx={{ display: 'flex', justifyContent: 'center' }}
+        >
+          <Button variant="contained"> {'<'} </Button>
+          <Button variant="contained"> 1 </Button>
+          <Button variant="text"> 2 </Button>
+          <Button variant="text"> 3 </Button>
+          <Button variant="text"> 4 </Button>
+          <Button variant="text"> 5 </Button>
+          <Button variant="text"> 6 </Button>
+          <Button variant="text"> 7 </Button>
+          <Button variant="text"> 8 </Button>
+          <Button variant="text"> 9 </Button>
+          <Button variant="text"> 10 </Button>
+          <Button variant="contained"> {'>'} </Button>
+        </Box>
       </Grid>
-      {/* <div className="col-12 d-flex justify-content-center ">
-          <strong>{results.length} &#160;</strong> Kết quả | Đường dẫn: &#160;
-          <strong>
-            {path !== ''
-              ? `...${path.substring(path.length - 15, path.length)}`
-              : 'Chưa chọn'}
-          </strong>
-        </div> */}
     </Grid>
   );
 };
