@@ -1,9 +1,10 @@
-import { Box, Button } from '@mui/material';
-import Card from '@mui/material/Card';
-import CardActions from '@mui/material/CardActions';
-import CardContent from '@mui/material/CardContent';
-import CardMedia from '@mui/material/CardMedia';
-import Typography from '@mui/material/Typography';
+import {
+  Card,
+  CardActionArea,
+  CardContent,
+  CardMedia,
+  Typography,
+} from '@mui/material';
 import { IMangaSearchList } from 'interfaces';
 import { useNavigate } from 'react-router-dom';
 
@@ -14,42 +15,28 @@ type Props = {
 export const ResultCard = (props: Props) => {
   const { item } = props;
   const navigate = useNavigate();
-
   const handleViewManga = () => {
-    navigate(`/info?target=${item.link}`);
-  };
-
-  const downloadAll = () => {
-    console.log(item);
+    navigate(`/info?target=${item.link}&name=${item.name}`);
   };
   return (
-    <Box className="bg-component--dark">
-      {/* <p className="card-text">{item.link}</p> */}
-
-      <Card sx={{ maxWidth: 345 }}>
+    <Card sx={{ width: 200 }}>
+      <CardActionArea onClick={handleViewManga}>
         <CardMedia
           component="img"
-          alt="green iguana"
-          height="300"
           image={item.bgurl}
+          alt={item.name}
+          sx={{ maxHeight: 250 }}
         />
         <CardContent>
-          <Typography variant="body2" color="text.secondary">
-            {item.name.length < 25
-              ? item.name
-              : `${item.name.substring(0, 25)} ...`}
+          <Typography noWrap variant="h6">
+            {item.name}
+          </Typography>
+          <Typography noWrap variant="subtitle1">
+            {item.lastChapter}
           </Typography>
         </CardContent>
-        <CardActions>
-          <Button size="small" onClick={() => handleViewManga()}>
-            Xem
-          </Button>
-          <Button size="small" onClick={() => downloadAll()}>
-            Tải toàn bộ
-          </Button>
-        </CardActions>
-      </Card>
-    </Box>
+      </CardActionArea>
+    </Card>
   );
 };
 export default ResultCard;

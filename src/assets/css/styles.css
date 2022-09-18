@@ -3,6 +3,7 @@ body {
   width: 100%;
   min-height: 100vh;
   overflow-x: hidden;
+  overflow-y: overlay;
   user-select: none;
   font-family: "Montserrat", sans-serif;
   background-image: linear-gradient(to right top, #181e30, #1d2336, #22283c, #272e42, #2c3348, #32394f, #373f56, #3d455d, #454e67, #4d5671, #565f7c, #5e6886);
@@ -842,3 +843,24 @@ body {
 }
 
 /*# sourceMappingURL=styles.css.map */
+
+/* ===== Scrollbar CSS ===== */
+  /* Firefox */
+  * {
+    scrollbar-width: auto;
+    scrollbar-color: #c7c7c7 #ffffff;
+  }
+
+  /* Chrome, Edge, and Safari */
+  *::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent !important;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    background-color: #c7c7c7;
+    border-radius: 12px;
+  }

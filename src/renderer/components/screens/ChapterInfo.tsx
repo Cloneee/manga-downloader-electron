@@ -1,69 +1,44 @@
-import { Button, Grid } from '@mui/material';
+/* eslint-disable react/no-array-index-key */
+import { Container } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
 export const ChapterInfo = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const mangaUrl: string | null = searchParams.get('mangaurl');
   const link: string | null = searchParams.get('url');
   const chapter: string | null = searchParams.get('chapter');
   const name: string | null = searchParams.get('name');
-
-  // const nlink: string | null = searchParams.get('nurl');
-  // const nchapter: string | null = searchParams.get('nchapter');
-
-  // const plink: string | null = searchParams.get('purl');
-  // const pchapter: string | null = searchParams.get('pchapter');
-
   const [listImageLink, setlistImageLink] = useState<string[]>([]);
   useEffect(() => {
     const getMangaInfo = async () => {
-      let rawInfo: string[] = [];
+      let imagesURL: string[] = [];
       if (name && chapter && link) {
-        rawInfo = await window.electron.crawler.getImages({
+        imagesURL = await window.electron.crawler.getImages({
           name,
           chapter,
           url: link,
         });
       }
-      setlistImageLink(rawInfo);
+      setlistImageLink(imagesURL);
     };
     getMangaInfo();
   }, [chapter, name, link]);
+
+  // TODO: Button, press to go to other chapter
+
   return (
-    <Grid container direction="row" sx={{ color: 'white' }}>
-      <Grid item xs={12} alignItems="center">
-        <Button
-          onClick={() => navigate(`/info?target=${mangaUrl}`)}
-          type="button"
-          className=""
-        >
-          Quay lại
-        </Button>
-        <strong>
-          {name} | {chapter}
-        </strong>
-      </Grid>
-      <Grid xs={12} sx={{ justifyContent: 'center' }}>
-        <Button className="">Chương trước </Button>
-        <Button className="">Chương sau </Button>
-      </Grid>
-      <Grid xs={3} />
-      <Grid xs={6}>
-        {listImageLink.map((url) => {
-          return (
-            <img
-              src={url}
-              key={url}
-              style={{ width: '100%', height: 'auto', marginBottom: '1em' }}
-              alt="i"
-            />
-          );
-        })}
-      </Grid>
-      <Grid xs={3} />
-    </Grid>
+    <Container>
+      {listImageLink.map((image: string, index: number) => (
+        <img
+          src={image}
+          style={{ width: '100%', height: 'auto' }}
+          alt={`${name} - ${index}`}
+          key={`${name} - ${index}`}
+          loading="lazy"
+        />
+      ))}
+    </Container>
   );
 };
 export default ChapterInfo;

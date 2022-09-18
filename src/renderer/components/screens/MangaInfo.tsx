@@ -1,96 +1,46 @@
-import ArrowLeftIcon from '@mui/icons-material/ArrowLeft';
-import { Box, Button, Checkbox, Chip, Grid } from '@mui/material';
+import {
+  Box,
+  Button,
+  Chip,
+  Container,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Typography,
+} from '@mui/material';
 import { IMangaInfo } from 'interfaces';
-import React, { useEffect, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { useEffect, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { DownloadBar } from '../common/DownloadBar';
+import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
+interface IChapters {
+  chapter: string;
+  url: string;
+}
 
 export const Info = () => {
+  const style = {
+    details: { display: 'flex', gap: 2, alignItems: 'center' },
+  };
+
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
   const link: string | null = searchParams.get('target');
-  const [percentComplete, setpercentComplete] = useState<number>(0);
-  const [downloadStatus, setdownloadStatus] = useState<string>('Đang bắt đầu');
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
 
-  const [info, setinfo] = useState<IMangaInfo>();
-  const [isCheckedAll, setisCheckedAll] = useState<boolean>(false);
-  const [checkedList, setcheckedList] = useState<boolean[]>(
-    Array(info?.chapters.length).fill(false)
-  );
-  const handleCheckBoxOnClick = (target: any) => {
-    const tempArr = [...checkedList];
-    const tempTargetIndex = target.target.name;
-    if (tempArr[tempTargetIndex] === true) tempArr[tempTargetIndex] = false;
-    else tempArr[tempTargetIndex] = true;
-    setcheckedList(tempArr);
-  };
+  const [info, setInfo] = useState<IMangaInfo>();
   useEffect(() => {
     const getMangaInfo = async () => {
       if (link) {
         const rawInfo: IMangaInfo = await window.electron.crawler.getInfo(link);
-        setinfo(rawInfo);
+        setInfo(rawInfo);
       }
     };
     getMangaInfo();
   }, [link]);
-  // const onSubmit: SubmitHandler<any> = (data) => console.log(checkedList);
 
-  const exportListChapter = info?.chapters.map((chapter, index) => {
-    return (
-      <div
-        className={
-          index % 2 === 0 ? 'bg-light border text-start ' : 'border text-start '
-        }
-        key={chapter.chapter}
-        style={{ paddingLeft: '45%', cursor: 'pointer' }}
-      >
-        <div>
-          {' '}
-          <Checkbox
-            // name={index+''}
-            // eslint-disable-next-line react/jsx-props-no-spreading
-            {...register(String(index))}
-            // value={true}
-            checked={checkedList[index]}
-            onClick={(target) => handleCheckBoxOnClick(target)}
-          />
-          <strong
-            role="button"
-            tabIndex={0}
-            onClick={() =>
-              navigate(
-                `/chapter?url=${chapter.url}&chapter=${chapter.chapter}&name=${
-                  info.name
-                }&purl=${info.chapters[index - 1].url}&pchapter=${
-                  info.chapters[index - 1].chapter
-                }&nurl=${info.chapters[index - 1].url}&nchapter=${
-                  info.chapters[index - 1].chapter
-                }&mangaurl=${link}`
-              )
-            }
-            onKeyUp={() => {}}
-          >
-            {chapter.chapter}
-          </strong>
-        </div>
-      </div>
-    );
-  });
-  const handleCheckAllButtonOnClick = () => {
-    if (isCheckedAll === true) {
-      setisCheckedAll(false);
-      setcheckedList(Array(info?.chapters.length).fill(false));
-    } else {
-      setisCheckedAll(true);
-      setcheckedList(Array(info?.chapters.length).fill(true));
-    }
-  };
   const downLoadChapter = async (chapter: any) => {
     if (info) {
       await window.electron.crawler.download({
@@ -100,109 +50,162 @@ export const Info = () => {
       });
     }
   };
-  const handleDownloadAll = async () => {
-    if (info) {
-      for (let i = 0; i < info.chapters.length; i += 1) {
-        // eslint-disable-next-line no-await-in-loop
-        await downLoadChapter(info.chapters[i]);
-        setdownloadStatus(`Đã tải ${i - 1} / ${info.chapters.length}`);
-        setpercentComplete(Math.floor((i / (info.chapters.length - 1)) * 100));
-      }
-    }
+
+  const handleClickChapter = (
+    chapter: string | undefined,
+    url: string | undefined
+  ) => {
+    navigate(
+      `/chapter?url=${url}&chapter=${chapter}&name=${info?.name}&target=${link}`
+    );
   };
 
   return (
-    <Grid container spacing={2}>
-      <Grid xs={3}>
-        <img src={info?.thumbnail} style={{ width: '90%' }} alt="something" />
-      </Grid>
-
-      <Grid xs={9}>
-        {' '}
-        <Box>
-          <h3>
+    <Container maxWidth="xl">
+      <Box sx={{ display: 'flex', gap: 2 }}>
+        <Box sx={{ flexGrow: 0, flexShrink: 0 }}>
+          <Box sx={{ maxWidth: 300 }}>
+            <img
+              src={info?.thumbnail}
+              alt={info?.name}
+              style={{ width: '100%', height: 'auto' }}
+            />
+          </Box>
+          <Box sx={{ display: 'flex', gap: 2 }}>
             <Button
-              onClick={() => navigate('/')}
-              // type="button"
-              // className="btn__primary"
+              variant="contained"
+              sx={{ flexGrow: 1 }}
+              onClick={() => {
+                handleClickChapter(
+                  info?.chapters[info?.chapters.length - 1].chapter,
+                  info?.chapters[info?.chapters.length - 1].url
+                );
+              }}
             >
-              <ArrowLeftIcon fontSize="large" />
+              Chương đầu
             </Button>
-            <strong>
-              {info?.name} ({info?.otherName})
-            </strong>
-          </h3>
+            <Button
+              variant="contained"
+              sx={{ flexGrow: 1 }}
+              onClick={() => {
+                handleClickChapter(
+                  info?.chapters[0].chapter,
+                  info?.chapters[0].url
+                );
+              }}
+            >
+              Chương cuối
+            </Button>
+          </Box>
         </Box>
-        <div>
-          <h6>
-            Tác giả: {info?.author} {percentComplete}
-          </h6>
-        </div>
-        <div>
-          <h6>Trạng thái: {info?.status}</h6>
-        </div>
-        <div className="">
-          <h6>
-            Thể loại:{' '}
-            {info?.tag.map((tag) => {
+        <Box
+          sx={{
+            flexGrow: 1,
+            flexShrink: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+          }}
+        >
+          <Typography
+            variant="h3"
+            sx={{ textTransform: 'uppercase', fontWeight: 400 }}
+          >
+            {info?.name}
+          </Typography>
+          <Box
+            sx={{
+              display: 'flex',
+              gap: 2,
+              alignItems: 'center',
+              flexWrap: 'wrap',
+            }}
+          >
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              Thể loại:
+            </Typography>
+            {info?.tag.map((tag: string) => {
               return (
                 <Chip
-                  sx={{ marginInlineEnd: '.5em', marginInlineStart: '.5em' }}
+                  color="secondary"
                   label={tag}
-                  key={tag}
-                  color="primary"
+                  clickable
+                  sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}
                 />
               );
             })}
-          </h6>
-        </div>
-        <div>
-          <div>
-            <p>
-              <h6>Mô tả:</h6> {info?.summary}
-            </p>
-          </div>
-        </div>
-      </Grid>
-      <form id="my-form">
-        <div
-          className="col-12  "
-          style={{ height: '50vh', color: 'black', overflow: 'auto' }}
-        >
-          {exportListChapter}
-        </div>
-        <div className="col-12 my-4">
-          <Button
-            type="button"
-            onClick={() => handleCheckAllButtonOnClick()}
-            style={{ backgroundColor: '#25d366', margin: '2px' }}
-            onKeyUp={() => {}}
-          >
-            <i className="fas fa-check" />
-            &#160; {isCheckedAll !== true ? 'Chọn tất cả' : 'Bỏ chọn tất cả'}
-          </Button>
-          <Button
-            onClick={() => handleDownloadAll()}
-            form="my-form"
-            type="submit"
-            style={{ margin: '2px' }}
-          >
-            <i className="fas fa-arrow-circle-down" />
-            &#160; Tải các chương đã chọn
-          </Button>
-          <Button
-            type="button"
-            onClick={() => handleDownloadAll()}
-            style={{ margin: '2px' }}
-          >
-            <i className="fas fa-arrow-circle-down" /> &#160;Tải xuống toàn bộ
-          </Button>
-        </div>
-      </form>
-      <Grid xs={12} sx={{ height: '70px' }} />
-      {percentComplete}
-      <DownloadBar status={downloadStatus} value={percentComplete} />
-    </Grid>
+          </Box>
+          <Box sx={style.details}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              Tên khác:
+            </Typography>
+            <Typography>{info?.otherName}</Typography>
+          </Box>
+          <Box sx={style.details}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              Tác giả:
+            </Typography>
+            <Typography>{info?.author}</Typography>
+          </Box>
+          <Box sx={style.details}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold' }}>
+              Trạng thái:
+            </Typography>
+            <Chip
+              label={info?.status}
+              color="success"
+              sx={{ textTransform: 'uppercase', fontWeight: 'bold' }}
+            />
+          </Box>
+          <Box sx={style.details}>
+            <Typography variant="h6" sx={{ fontWeight: 'bold', flexShrink: 0 }}>
+              Mô tả:
+            </Typography>
+            <Typography>{info?.summary}</Typography>
+          </Box>
+          <TableContainer sx={{ maxHeight: '50vh', overflow: 'auto' }}>
+            <Table stickyHeader>
+              <TableHead>
+                <TableRow>
+                  <TableCell sx={{ backgroundColor: '#0f1325' }}>
+                    <Typography variant="h6">Tên chapter</Typography>
+                  </TableCell>
+                  <TableCell align="right" sx={{ backgroundColor: '#0f1325' }}>
+                    <Typography variant="h6">Downloaded</Typography>
+                  </TableCell>
+                </TableRow>
+              </TableHead>
+              <TableBody>
+                {info?.chapters.map((item: IChapters, index) => (
+                  <TableRow
+                    // eslint-disable-next-line react/no-array-index-key
+                    key={item.chapter + index}
+                    hover
+                    sx={{
+                      '&:last-child td, &:last-child th': { border: 0 },
+                      cursor: 'pointer',
+                    }}
+                  >
+                    <TableCell
+                      component="th"
+                      scope="row"
+                      onClick={() => {
+                        handleClickChapter(item.chapter, item.url);
+                      }}
+                    >
+                      <Typography variant="body1">{item.chapter}</Typography>
+                    </TableCell>
+                    <TableCell align="right">
+                      <CheckCircleIcon />
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 

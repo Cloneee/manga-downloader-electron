@@ -2,6 +2,7 @@ interface IMangaSearchList {
   name: string;
   link: string;
   bgurl: string;
+  lastChapter: string;
 }
 interface IMangaInfo {
   name: string;

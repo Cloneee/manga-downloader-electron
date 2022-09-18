@@ -1,3 +1,4 @@
+import { Box } from '@mui/material';
 import { MemoryRouter as Router, Route, Routes } from 'react-router-dom';
 import '../assets/css/styles.css';
 import {
@@ -6,6 +7,7 @@ import {
   IMangaInfo,
   IMangaSearchList,
 } from '../interfaces';
+import NavBar from './components/common/NavBar';
 import { ChapterInfo } from './components/screens/ChapterInfo';
 import { Index } from './components/screens/Index';
 import { Info } from './components/screens/MangaInfo';
@@ -40,11 +42,14 @@ declare global {
 export default function App() {
   return (
     <Router>
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/info" element={<Info />} />
-        <Route path="/chapter" element={<ChapterInfo />} />
-      </Routes>
+      <NavBar />
+      <Box sx={{ mt: 10 }}>
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/info" element={<Info />} />
+          <Route path="/chapter" element={<ChapterInfo />} />
+        </Routes>
+      </Box>
     </Router>
   );
 }

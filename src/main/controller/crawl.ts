@@ -4,7 +4,7 @@
 /* eslint-disable prefer-destructuring */
 /* eslint-disable @typescript-eslint/no-unused-expressions */
 import axios from 'axios';
-import cheerio from 'cheerio';
+import * as cheerio from 'cheerio';
 import path from 'path';
 import fs from 'fs';
 import https from 'https';
@@ -29,6 +29,9 @@ const search = async (mangaName: string, page: number) => {
     const aTag = $(el).find('.thumb_attr.series-title').find('a');
     const name = aTag.text();
     const link = aTag.attr('href');
+    const lastChapter = $(el)
+      .find('.thumb_attr.chapter-title')
+      .attr('title') as string;
 
     // get thumbnail
     const bg = $(el)
@@ -42,6 +45,7 @@ const search = async (mangaName: string, page: number) => {
       name,
       link: newlink,
       bgurl,
+      lastChapter,
     });
   });
   return mangaList;
@@ -106,7 +110,7 @@ const download = (
 ) => {
   return new Promise<void>((resolve) => {
     https.get(url as string, (resp) => {
-      const newIndex = `000${index}`.substr(-3);
+      const newIndex = `000${index}`.substring(-3);
       const fileStream = fs.createWriteStream(
         path.join(DIR, name, chapter, `${newIndex}.jpg`)
       );
